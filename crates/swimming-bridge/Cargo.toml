@@ -1,0 +1,16 @@
+[package]
+name = "swimming-bridge"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rquickjs = "0.14.0"
+swimming-core = { path = "../swimming-core" }
+swimming-render = { path = "../swimming-render" }
+
+[lib]
+name = "swimming_bridge"
+
+[[bin]]
+name = "swimming"
+path = "src/main.rs"

@@ -1,6 +1,6 @@
 //! Software painter (tiny-skia). Draws backgrounds, borders and rounded corners;
 //! glyph rasterization is a TODO (text boxes are laid out but not yet drawn).
-use crate::layout::{Box, LaidOut};
+use swimming_core::{LayoutBox as Box, LaidOut};
 use tiny_skia::{Color, FillRule, Paint, PathBuilder, Pixmap, Stroke, Transform};
 
 fn rrect(x: f32, y: f32, w: f32, h: f32, r: f32) -> Option<tiny_skia::Path> {
@@ -42,6 +42,7 @@ fn paint_box(pm: &mut Pixmap, b: &Box, ox: f32, oy: f32) {
     for ch in &b.children { paint_box(pm, ch, x, y); }
 }
 
+pub use tiny_skia;
 pub fn paint(l: &LaidOut, width: u32, height: u32) -> Option<Pixmap> {
     let mut pm = Pixmap::new(width.max(1), height.max(1))?;
     pm.fill(Color::WHITE);

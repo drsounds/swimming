@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2022", "module": "NodeNext", "moduleResolution": "NodeNext",
-    "jsx": "react", "types": ["node"], "strict": true, "esModuleInterop": true, "skipLibCheck": true,
-    "outDir": "dist", "declaration": true
+    "target": "ES2020", "module": "ESNext", "moduleResolution": "Bundler",
+    "jsx": "react", "strict": true, "esModuleInterop": true, "skipLibCheck": true,
+    "types": ["node"], "noEmit": true, "lib": ["ES2020", "DOM"]
   },
-  "include": ["src", "test"]
+  "include": ["packages", "examples"],
+  "exclude": ["**/node_modules", "**/dist"]
 }

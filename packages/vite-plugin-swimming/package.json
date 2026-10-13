@@ -1,0 +1,1 @@
+{ "name": "vite-plugin-swimming", "version": "0.1.0", "type": "module", "main": "src/index.ts", "peerDependencies": { "vite": ">=5" } }
