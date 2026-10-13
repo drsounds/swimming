@@ -1,17 +1,24 @@
 # swimming
-A TypeScript framework for porting React.JS web apps (Electron/Chromium) to native Rust UI.
+A "react-native-rust" for desktop apps: a Tauri-style shell with **no browser engine**. Write UI in React `.tsx` with ordinary HTML elements, DOM-style events and CSS; a Rust engine renders it natively.
 
-- Write UI in `.tsx` with common HTML elements (`div`, `span`, `button`, ...), DOM-style events (`onClick`, ...) and CSS (`style` objects or strings).
-- A custom React reconciler (`react-reconciler`) builds a host tree; layout is computed with [Yoga](https://yogalayout.dev).
-- After every commit the laid-out scene (`SceneNode`) is passed to a pluggable `Backend` (e.g. a Rust Druid or imgui host). Backends deliver native events back through `setEventDispatcher`, which bubbles them like DOM events.
-- Node.js packages can be used freely in the JS side.
-
-```tsx
-import { createRoot, JsonBackend } from "swimming";
-const backend = new JsonBackend((line) => process.stdout.write(line + "\n"));
-createRoot(backend).render(<div style={{ padding: 10 }}>Hello</div>);
+```
+React (TSX) -> custom reconciler -> virtual tree (JSON lines) -> Rust engine
+                                                                 ├─ CSS:    lightningcss
+                                                                 ├─ layout: taffy (flexbox)
+                                                                 └─ paint:  tiny-skia (pluggable window backends: Druid, imgui, ...)
 ```
 
-`JsonBackend` is a reference backend streaming scenes as JSON lines for a Rust host to consume.
+There is no DOM and no DOM emulation layer: the reconciler emits React's virtual tree and Rust resolves CSS and lays it out directly. Events are hit-tested natively and sent back to JS handlers, bubbling like DOM events.
 
-Scripts: `npm run build`, `npm test`.
+- `src/` – TypeScript: React reconciler, `createRoot(backend)`, `NativeBackend` (spawns the Rust engine), `JsonBackend` (in-process/testing).
+- `native/` – Rust crate `swimming-native`: UA defaults for all HTML elements (hidden elements such as `head`/`script`, block vs. inline), inline CSS, flexbox layout, anonymous inline runs, hit testing, software painting (backgrounds, borders, radius) to PNG with `--out`.
+
+```tsx
+import { createRoot, NativeBackend } from "swimming";
+createRoot(new NativeBackend("native/target/release/swimming-native", ["--out", "frame.png"]))
+  .render(<div style={{ padding: 10 }}><button onClick={() => console.log("hi")}>Click</button></div>);
+```
+
+Current limitations: no text glyph rendering yet (text is laid out with approximate metrics), no `<style>` sheets/selectors yet (inline styles + UA defaults), no window backend yet (headless PNG), no form-control behaviour, images, or non-px/%/em units beyond basics.
+
+Scripts: `npm run build`, `npm test`; `cd native && cargo test`.

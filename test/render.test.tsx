@@ -1,38 +1,37 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import React, { useState } from "react";
-import { createRoot, JsonBackend, type SceneNode } from "../src/index.js";
+import { createRoot, JsonBackend, type VNode } from "../src/index.js";
 
 const flush = () => new Promise((r) => setTimeout(r, 20));
-const find = (n: SceneNode, t: string): SceneNode | undefined =>
+const find = (n: VNode, t: string): VNode | undefined =>
   n.type === t ? n : n.children.map((c) => find(c, t)).find(Boolean);
 
-test("renders html elements with yoga layout", async () => {
-  const b = new JsonBackend(() => {}, { width: 200, height: 100 });
+test("emits a plain virtual tree with CSS serialized for the Rust engine", async () => {
+  const b = new JsonBackend();
   createRoot(b).render(
-    <div style={{ flexDirection: "row", padding: 10 }}>
-      <span style={{ width: 50, height: 20 }}>hi</span>
-      <span style={{ width: 30, height: 20, marginLeft: 5 }}>yo</span>
+    <div style={{ flexDirection: "row", padding: 10, opacity: 0.5 }}>
+      <table style={"width: 50px" as never}><caption>hi</caption></table>
     </div>
   );
   await flush();
-  const div = b.last!.children[0];
-  assert.equal(div.type, "div");
-  assert.deepEqual(div.children[0].layout, { x: 10, y: 10, width: 50, height: 20 });
-  assert.equal(div.children[1].layout.x, 65);
+  assert.equal(b.last!.type, "div");
+  assert.equal(b.last!.style, "flex-direction:row;padding:10px;opacity:0.5");
+  assert.equal(b.last!.children[0].style, "width: 50px");
+  assert.equal(find(b.last!, "caption")!.children[0].text, "hi");
 });
 
-test("dispatches DOM events and re-renders", async () => {
-  const b = new JsonBackend(() => {});
+test("dispatches native events and re-renders", async () => {
+  const b = new JsonBackend();
   function App() {
     const [n, set] = useState(0);
     return <button onClick={() => set(n + 1)}>{`count ${n}`}</button>;
   }
   createRoot(b).render(<App />);
   await flush();
-  const btn = find(b.last!, "button")!;
-  assert.equal(find(btn, "#text")!.text, "count 0");
-  b.dispatch!(btn.id, "click");
+  assert.equal(find(b.last!, "#text")!.text, "count 0");
+  assert.equal(b.last!.props.onClick, true);
+  b.dispatch!(b.last!.id, "click");
   await flush();
-  assert.equal(find(find(b.last!, "button")!, "#text")!.text, "count 1");
+  assert.equal(find(b.last!, "#text")!.text, "count 1");
 });

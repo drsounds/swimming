@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
-import { createReconciler, createHostNode, toScene, type Container } from "./reconciler.js";
+import { createReconciler, createHostNode, toVNode, type Container } from "./reconciler.js";
 import type { Backend, HostNode } from "./types.js";
 
 export * from "./types.js";
-export { parseCss, normalizeStyle } from "./css.js";
+export { styleToCss } from "./reconciler.js";
 export { JsonBackend } from "./backends/json.js";
+export { NativeBackend } from "./backends/native.js";
 
 const reconciler = createReconciler();
 
@@ -18,19 +19,13 @@ const EVENT_PROPS: Record<string, string> = {
   keyup: "onKeyUp", mouseenter: "onMouseEnter", mouseleave: "onMouseLeave",
 };
 
-/** Mounts a React tree and presents laid out scenes to the given native backend. */
+/** Mounts a React tree and presents its virtual tree to the given native backend. */
 export function createRoot(backend: Backend): Root {
   const rootNode: HostNode = createHostNode("root", {});
   const container: Container = {
     root: rootNode,
-    nodes: new Map(),
-    onCommit: (root) => {
-      const size = backend.size?.() ?? { width: 800, height: 600 };
-      root.yoga.setWidth(size.width);
-      root.yoga.setHeight(size.height);
-      root.yoga.calculateLayout(size.width, size.height);
-      backend.present(toScene(root));
-    },
+    // The Rust engine renders a single root element; wrap multiple children in one.
+    onCommit: (root) => backend.present(toVNode(root.children.length === 1 ? root.children[0] : root)),
   };
   const find = (n: HostNode, id: number): HostNode | undefined =>
     n.id === id ? n : n.children.map((c) => find(c, id)).find(Boolean);

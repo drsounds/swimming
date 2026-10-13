@@ -1,14 +1,10 @@
-import type { Backend, SceneNode } from "../types.js";
+import type { Backend, VNode } from "../types.js";
 
-/**
- * Reference backend: emits each scene as one JSON line. A Rust host
- * (Druid, imgui, ...) can consume this stream and send events back.
- */
+/** In-process backend: keeps the last virtual tree and emits it as a JSON line. */
 export class JsonBackend implements Backend {
-  last?: SceneNode;
+  last?: VNode;
   dispatch?: (nodeId: number, event: string, payload?: unknown) => void;
-  constructor(private out: (line: string) => void = () => {}, private dims = { width: 800, height: 600 }) {}
-  present(scene: SceneNode) { this.last = scene; this.out(JSON.stringify(scene)); }
+  constructor(private out: (line: string) => void = () => {}) {}
+  present(root: VNode) { this.last = root; this.out(JSON.stringify({ type: "tree", root })); }
   setEventDispatcher(d: (nodeId: number, event: string, payload?: unknown) => void) { this.dispatch = d; }
-  size() { return this.dims; }
 }
