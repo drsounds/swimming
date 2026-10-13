@@ -1,0 +1,21 @@
+{
+  "name": "swimming-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Swimming: native Rust GUI for React/TSX apps, no browser engine",
+  "type": "module",
+  "workspaces": ["packages/*", "examples/*"],
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --import tsx --test packages/*/test/*.test.ts*",
+    "build:example": "npm run build -w hello-swimming"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^18.3.0",
+    "@types/react-reconciler": "^0.28.9",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
