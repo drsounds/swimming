@@ -8,13 +8,21 @@
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "node --import tsx --test packages/*/test/*.test.ts*",
-    "build:example": "npm run build -w hello-swimming"
+    "build:example": "npm run build -w hello-swimming",
+    "docs:dev": "docusaurus start docs",
+    "docs:build": "docusaurus build docs"
   },
   "license": "ISC",
   "devDependencies": {
+    "@docusaurus/core": "^3.10.2",
+    "@docusaurus/preset-classic": "^3.10.2",
+    "@mdx-js/react": "^3.1.1",
     "@types/node": "^26.6.5",
     "@types/react": "^18.3.0",
     "@types/react-reconciler": "^0.28.9",
+    "prism-react-renderer": "^2.4.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }
