@@ -71,6 +71,7 @@ if (!g.setTimeout) {
 }
 if (!g.queueMicrotask) g.queueMicrotask = (fn: () => void) => { Promise.resolve().then(fn); };
 if (!g.performance) g.performance = { now: () => now };
+if (!g.console) g.console = { log() {}, info() {}, warn() {}, error() {}, debug() {} };
 
 /** Runs the next due timer; returns true if more work is pending. Called repeatedly by the host. */
 g.__SWIMMING_TICK__ = (advanceMs = 0): boolean => {

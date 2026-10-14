@@ -1,8 +1,11 @@
 //! swimming-bridge: embeds QuickJS, exposes the native `__SWIMMING_NATIVE__` command API
 //! to the React reconciler and routes native events back into JS.
-use rquickjs::{Context, Function, Object, Runtime};
+use rquickjs::{Context, Exception, Function, Object, Runtime};
 use std::sync::{Arc, Mutex};
 use swimming_core::SwimmingEngine;
+
+pub mod gui;
+pub mod loader;
 
 pub struct JsBridge {
     // Field order matters: the context must drop before the runtime.
@@ -23,6 +26,10 @@ impl JsBridge {
     }
 
     pub fn engine(&self) -> Arc<Mutex<SwimmingEngine>> { self.engine.clone() }
+
+    pub fn resize(&self, width: f32, height: f32) {
+        self.engine.lock().unwrap().compute_layout(width, height);
+    }
 
     fn register_globals(&self) -> rquickjs::Result<()> {
         let engine = self.engine.clone();
@@ -73,6 +80,42 @@ impl JsBridge {
         self.run_until_idle()
     }
 
+    pub fn eval_script(&self, source: &str) -> Result<(), String> {
+        self.context.with(|ctx| {
+            ctx.eval::<(), _>(source).map_err(|error| {
+                ctx.catch()
+                    .into_object()
+                    .and_then(Exception::from_object)
+                    .map(|exception| exception.to_string())
+                    .unwrap_or_else(|| error.to_string())
+            })
+        })?;
+        self.run_until_idle_detailed()
+    }
+
+    fn run_until_idle_detailed(&self) -> Result<(), String> {
+        for _ in 0..10_000 {
+            self.drain_jobs();
+            let pending = self.context.with(|ctx| {
+                match ctx.globals().get::<_, Function>("__SWIMMING_TICK__") {
+                    Ok(function) => function.call::<_, bool>((0,)).map_err(|error| {
+                        ctx.catch()
+                            .into_object()
+                            .and_then(Exception::from_object)
+                            .map(|exception| exception.to_string())
+                            .unwrap_or_else(|| error.to_string())
+                    }),
+                    Err(_) => Ok(false),
+                }
+            })?;
+            if !pending {
+                break;
+            }
+        }
+        self.drain_jobs();
+        Ok(())
+    }
+
     /// QuickJS has no event loop: drain promise jobs and run polyfilled timers (`__SWIMMING_TICK__`) until idle.
     pub fn run_until_idle(&self) -> rquickjs::Result<()> {
         for _ in 0..10_000 {
@@ -87,6 +130,16 @@ impl JsBridge {
         }
         self.drain_jobs();
         Ok(())
+    }
+
+    pub fn tick(&self, elapsed_ms: u32) -> rquickjs::Result<()> {
+        self.context.with(|ctx| -> rquickjs::Result<()> {
+            if let Ok(f) = ctx.globals().get::<_, Function>("__SWIMMING_TICK__") {
+                let _: bool = f.call((elapsed_ms,))?;
+            }
+            Ok(())
+        })?;
+        self.run_until_idle()
     }
 
     fn drain_jobs(&self) {
