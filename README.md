@@ -25,7 +25,30 @@ cargo run -p swimming-bridge -- examples/hello-swimming/dist/bundle.js --width 5
 npm test && cargo test
 ```
 
+## Run a native window
+
+Run a built Swimming bundle in an egui window (the default backend):
+
+```sh
+cargo run -p swimming-bridge -- examples/hello-swimming/dist/bundle.js
+```
+
+To use the Fastframe shell integration, build with its optional feature and select it:
+
+```sh
+cargo run -p swimming-bridge --features fastframe -- examples/hello-swimming/dist/bundle.js --backend fastframe
+```
+
+The CLI also accepts a local HTML file or an HTTP URL. HTML body elements are added to the native layout tree, and inline or classic external JavaScript script tags run in document order. Vite's dev server is supported by the Swimming plugin's native bundle endpoint:
+
+```sh
+npm run dev -w hello-swimming -- --host 127.0.0.1
+cargo run -p swimming-bridge -- http://127.0.0.1:5173/?swimming-native
+```
+
+`--out frame.png` keeps the existing one-frame, headless PNG mode. Windows tagged releases build `swimming.exe` with both GUI backends and attach it to the GitHub release.
+
 ## Deviations from the spec / not yet done
-- Rendering uses a CPU painter (tiny-skia, PNG output) instead of Vello/WGPU + Swash; no window or GPU yet, and **text glyphs are not drawn** (text is laid out with approximate metrics).
+- Rendering uses a CPU painter (tiny-skia) instead of Vello/WGPU + Swash; **text glyphs are not drawn** (text is laid out with approximate metrics).
 - Layout is Taffy flexbox with HTML UA defaults (block/inline/hidden); Grid and `<style>` sheets/selectors are not wired up.
-- The JS engine is QuickJS only (Boa not supported). `<img>` loading and form-control behavior are not implemented.
+- The JS engine is QuickJS only (Boa not supported). Native loading skips browser ES modules in favor of the Vite plugin's generated IIFE bundle. `<img>` loading and form-control behavior are not implemented.
