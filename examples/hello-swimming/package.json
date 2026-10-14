@@ -1,6 +1,6 @@
 {
   "name": "hello-swimming", "private": true, "version": "0.1.0", "type": "module",
   "scripts": { "dev": "vite", "build": "vite build" },
-  "dependencies": { "react": "^18.3.1", "react-dom": "^18.3.1", "react-router-dom": "^6.28.0", "swimming-react": "*", "swimming-web-compat": "*" },
+  "dependencies": { "react": "^18.3.1", "react-dom": "^18.3.1", "react-router-dom": "^7.18.4", "swimming-react": "*", "swimming-web-compat": "*" },
   "devDependencies": { "vite": "^6.0.0", "vite-plugin-swimming": "*" }
 }
