@@ -1,13 +1,22 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 
+const baseUrl = '/swimming/';
+
 const config = {
   title: 'Swimming',
   tagline: 'Native desktop apps with Rust and React',
   url: 'https://drsounds.github.io',
-  baseUrl: '/swimming/',
+  baseUrl,
   organizationName: 'drsounds',
   projectName: 'swimming',
   onBrokenLinks: 'throw',
+  headTags: [
+    {
+      tagName: 'script',
+      attributes: {},
+      innerHTML: `document.head.insertAdjacentHTML('afterbegin', '<base href="' + location.origin + '${baseUrl}">');`,
+    },
+  ],
   future: {
     experimental_router: 'hash',
   },
