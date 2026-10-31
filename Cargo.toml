@@ -1,3 +1,10 @@
 [workspace]
 resolver = "2"
-members = ["crates/swimming-core", "crates/swimming-render", "crates/swimming-bridge"]
+members = [
+    "crates/swimming-core",
+    "crates/swimming-render",
+    "crates/swimming-js",
+    "crates/swimming-js-v8",
+    "crates/swimming-js-quickjs",
+    "crates/swimming-bridge",
+]

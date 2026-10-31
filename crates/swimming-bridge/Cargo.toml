@@ -4,8 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-rquickjs = "0.14.0"
 swimming-core = { path = "../swimming-core" }
+swimming-js = { path = "../swimming-js" }
+swimming-js-quickjs = { path = "../swimming-js-quickjs", optional = true }
+swimming-js-v8 = { path = "../swimming-js-v8", optional = true }
 swimming-render = { path = "../swimming-render" }
 eframe = { version = "=0.36.1", default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }
 fastframe-shell = { git = "https://github.com/crmne/fastframe", tag = "v0.2.3", optional = true }
@@ -15,9 +17,12 @@ ureq = "3.4.2"
 url = "2.5.8"
 
 [features]
-default = ["egui"]
+default = ["egui", "v8"]
 egui = []
 fastframe = ["egui", "dep:fastframe-shell"]
+# JavaScript engines; at least one is required. If both are enabled, QuickJS backs `JsBridge`.
+v8 = ["dep:swimming-js-v8"]
+quickjs = ["dep:swimming-js-quickjs"]
 
 [lib]
 name = "swimming_bridge"

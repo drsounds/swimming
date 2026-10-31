@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 /**
- * Bundles a TSX app into one script for the embedded QuickJS runtime:
+ * Bundles a TSX app into one script for the embedded JS engine (V8 or QuickJS):
  * a single IIFE file, ES2020, with the swimming-web-compat polyfills injected first.
  */
 export default function swimming(options: { entry?: string; fileName?: string } = {}): Plugin {

@@ -1,0 +1,8 @@
+[package]
+name = "swimming-js-quickjs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rquickjs = "0.14.0"
+swimming-js = { path = "../swimming-js" }

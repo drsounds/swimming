@@ -51,7 +51,7 @@ export const memoryHistory = new MemoryHistory();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const g = globalThis as any;
 
-// --- timers: run by the native host via __SWIMMING_TICK__ (QuickJS has no event loop) ---
+// --- timers: run by the native host via __SWIMMING_TICK__ (the embedded engine has no event loop) ---
 const timers: { id: number; at: number; fn: () => void; every?: number }[] = [];
 let timerId = 1;
 let now = 0; // virtual clock advanced by the host

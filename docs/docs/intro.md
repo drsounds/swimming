@@ -12,7 +12,7 @@ Unlike webview-based frameworks, Swimming does not embed a browser engine or DOM
 
 ```text
 TSX app → Vite bundle → web compatibility layer → React reconciler
-  → QuickJS bridge → Rust layout engine → native renderer
+  → JS engine bridge (V8 or QuickJS) → Rust layout engine → native renderer
 ```
 
 Use the guide to [build and run the example](./getting-started), or read about the

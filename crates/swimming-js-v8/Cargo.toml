@@ -1,0 +1,8 @@
+[package]
+name = "swimming-js-v8"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+swimming-js = { path = "../swimming-js" }
+v8 = "152.2.0"
